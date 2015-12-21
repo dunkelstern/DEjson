@@ -9,8 +9,11 @@
 // modification, are permitted under the conditions of the 3-clause
 // BSD license (see LICENSE.txt for full license text)
 
-
-import Foundation
+#if os(Linux)
+    import Glibc
+#else
+    import Darwin
+#endif
 
 public class JSONDecoder {
     public let string : String.UnicodeScalarView?
@@ -128,7 +131,7 @@ public class JSONDecoder {
                 break
             }
         }
-        return string.stringByReplacingOccurrencesOfString("\\n", withString: "\n")
+        return string
     }
 
     func parseHexDigit(digit: UnicodeScalar?) -> UInt32 {
@@ -150,7 +153,8 @@ public class JSONDecoder {
         var dictKey: String? = nil
         var dictEnded = false
 
-        while var c = generator.next() {
+        while let char = generator.next() {
+            var c = char
             while true {
                 switch c.value {
                 case 9, 10, 13, 32, 44: // space, tab, newline, cr, ','
@@ -190,7 +194,8 @@ public class JSONDecoder {
         var arr : Array<JSONObject> = Array()
         var arrayEnded = false
 
-        while var c = generator.next() {
+        while let char = generator.next() {
+            var c = char
             while true {
                 switch c.value {
                 case 9, 10, 13, 32, 44: // space, tab, newline, cr, ','
@@ -285,7 +290,10 @@ public class JSONDecoder {
                 }
             }
             if numberEnded {
-                let e = __exp10(Double(exponent - decimalCount))
+		var e:Double = 1
+                for _ in 1...(exponent - decimalCount) {
+                    e *= 10
+                }
                 number = number * e
                 number *= sign
                 return (numberEnded: true, backtrackChar: backtrack)
@@ -313,7 +321,10 @@ public class JSONDecoder {
             }
         }
 
-        let e = __exp10(Double(exponent - decimalCount))
+	var e:Double = 1
+	for _ in 1...(exponent - decimalCount) {
+	    e *= 10
+	}
         number = number * e
         number *= sign
         return (number: number, backtrackChar: nil)

@@ -9,7 +9,11 @@
 // modification, are permitted under the conditions of the 3-clause
 // BSD license (see LICENSE.txt for full license text)
 
-import Foundation
+#if os(Linux)
+    import Glibc
+#else
+    import Darwin
+#endif
 
 func * (left: String, right: Int) -> String {
     if right <= 0 {
@@ -160,6 +164,6 @@ public class JSONEncoder {
     }
     
     func makeHexString(value: UInt8) -> String {
-        return NSString(format: "%02x", value) as String
+        return String(format: "%02x", value)
     }
 }

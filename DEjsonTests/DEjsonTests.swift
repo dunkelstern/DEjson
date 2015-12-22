@@ -11,16 +11,20 @@ import XCTest
 
 class DEjsonTests: XCTestCase {
     
-    override func setUp() {
-        super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+    var allTests : [(String, () -> Void)] {
+        return [
+            ("testJSONDecoderStringFragment", testJSONDecoderStringFragment),
+            ("testJSONDecoderNumberFragment", testJSONDecoderNumberFragment),
+            ("testJSONDecoderFalseFragment", testJSONDecoderFalseFragment),
+            ("testJSONDecoderTrueFragment", testJSONDecoderTrueFragment),
+            ("testJSONDecoderNullFragment", testJSONDecoderNullFragment),
+            ("testJSONNumberInArray", testJSONNumberInArray),
+            ("testJSONNumberInDict", testJSONNumberInDict),
+            ("testJSONNumberInArrayOfDicts", testJSONNumberInArrayOfDicts),
+            ("testJSONDecoderComplex1", testJSONDecoderComplex1)
+        ]
     }
-    
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-        super.tearDown()
-    }
-    
+
     func testJSONDecoderStringFragment() {
         let obj = JSONDecoder("\"string\"").jsonObject
         if case .JSONString(let string) = obj {

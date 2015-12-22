@@ -10,7 +10,7 @@
 // BSD license (see LICENSE.txt for full license text)
 
 #if os(Linux)
-    import Glibc
+    import UnchainedGlibc
 #else
     import Darwin
 #endif

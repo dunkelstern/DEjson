@@ -10,7 +10,7 @@
 // BSD license (see LICENSE.txt for full license text)
 
 #if os(Linux)
-    import Glibc
+    import UnchainedGlibc
 #else
     import Darwin
 #endif
@@ -290,11 +290,7 @@ public class JSONDecoder {
                 }
             }
             if numberEnded {
-		var e:Double = 1
-                for _ in 1...(exponent - decimalCount) {
-                    e *= 10
-                }
-                number = number * e
+                number = number * exp10(Double(exponent - decimalCount))
                 number *= sign
                 return (numberEnded: true, backtrackChar: backtrack)
             }
@@ -321,11 +317,7 @@ public class JSONDecoder {
             }
         }
 
-	var e:Double = 1
-	for _ in 1...(exponent - decimalCount) {
-	    e *= 10
-	}
-        number = number * e
+        number = number * exp10(Double(exponent - decimalCount))
         number *= sign
         return (number: number, backtrackChar: nil)
     }

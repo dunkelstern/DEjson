@@ -17,7 +17,7 @@
 
 public class JSONDecoder {
     public let string : String.UnicodeScalarView?
-    
+
     public init(_ string: String) {
         self.string = string.unicodeScalars
     }
@@ -27,7 +27,7 @@ public class JSONDecoder {
         let result = self.scanObject(&generator)
         return result.obj
     }
-    
+
     func scanObject(inout generator: String.UnicodeScalarView.Generator, currentChar: UnicodeScalar = UnicodeScalar(0)) -> (obj: JSONObject, backtrackChar: UnicodeScalar?) {
         func parse(c: UnicodeScalar, inout generator: String.UnicodeScalarView.Generator) -> (obj: JSONObject?, backtrackChar: UnicodeScalar?) {
             switch c.value {
@@ -75,17 +75,17 @@ public class JSONDecoder {
                 }
             }
         }
-        
+
         return (obj: .JSONInvalid, backtrackChar: nil)
     }
-    
+
     // TODO: Add tests for escaped characters
     func parseString(inout generator: String.UnicodeScalarView.Generator) -> (String) {
         var stringEnded = false
         var slash = false
         var string = String()
         while let c = generator.next() {
-            
+
             if slash {
                 switch c.value {
                 case 34: // "
@@ -116,7 +116,7 @@ public class JSONDecoder {
                 slash = false
                 continue
             }
-            
+
             switch c.value {
             case 92: // \
                 // skip next char (could be a ")
@@ -126,7 +126,7 @@ public class JSONDecoder {
             default:
                 string.append(c)
             }
-            
+
             if stringEnded {
                 break
             }
@@ -147,7 +147,7 @@ public class JSONDecoder {
             return 0
         }
     }
-    
+
     func parseDict(inout generator: String.UnicodeScalarView.Generator) -> (Dictionary<String, JSONObject>?) {
         var dict : Dictionary<String, JSONObject> = Dictionary()
         var dictKey: String? = nil
@@ -166,7 +166,7 @@ public class JSONDecoder {
                         let result = self.scanObject(&generator)
                         dict.updateValue(result.obj, forKey: key)
                         dictKey = nil
-                        
+
                         // Backtrack one character
                         if let backTrack = result.backtrackChar {
                             c = backTrack
@@ -186,7 +186,7 @@ public class JSONDecoder {
                 break
             }
         }
-       
+
         return dict
     }
 
@@ -260,7 +260,7 @@ public class JSONDecoder {
                     exponentNumberStarted = true
                 }
                 if decimalStarted {
-                    decimalCount++
+                    decimalCount += 1
                     number = number * 10.0 + Double(c.value - 48)
                 } else if numberStarted {
                     number = number * 10.0 + Double(c.value - 48)
@@ -290,13 +290,17 @@ public class JSONDecoder {
                 }
             }
             if numberEnded {
-                number = number * exp10(Double(exponent - decimalCount))
+                #if os(Linux)
+                    number = number * exp10(Double(exponent - decimalCount))
+                #else
+                    number = number * __exp10(Double(exponent - decimalCount))
+                #endif
                 number *= sign
                 return (numberEnded: true, backtrackChar: backtrack)
             }
             return (numberEnded: false, backtrackChar: backtrack)
         }
-        
+
         let result = parse(currentChar, generator: &generator)
         if let numberEnded = result.numberEnded {
             if numberEnded {
@@ -305,7 +309,7 @@ public class JSONDecoder {
         } else {
             return (number: nil, backtrackChar: result.backtrackChar)
         }
-        
+
         while let c = generator.next() {
             let result = parse(c, generator: &generator)
             if let numberEnded = result.numberEnded {
@@ -317,7 +321,11 @@ public class JSONDecoder {
             }
         }
 
-        number = number * exp10(Double(exponent - decimalCount))
+        #if os(Linux)
+            number = number * exp10(Double(exponent - decimalCount))
+        #else
+            number = number * __exp10(Double(exponent - decimalCount))
+        #endif
         number *= sign
         return (number: number, backtrackChar: nil)
     }
@@ -329,14 +337,14 @@ public class JSONDecoder {
             case ParseStateTrue(Int)
             case ParseStateNull(Int)
             case ParseStateFalse(Int)
-            
+
             init() {
                 self = .ParseStateUnknown
             }
         }
-        
+
         var state = parseState()
-        
+
         switch currentChar.value {
         case 116: // t
             state = .ParseStateTrue(1)

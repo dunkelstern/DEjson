@@ -10,22 +10,8 @@ import XCTest
 @testable import DEjson
 
 class DEjsonTests: XCTestCase {
-    
-    var allTests : [(String, () -> Void)] {
-        return [
-            ("testJSONDecoderStringFragment", testJSONDecoderStringFragment),
-            ("testJSONDecoderNumberFragment", testJSONDecoderNumberFragment),
-            ("testJSONDecoderFalseFragment", testJSONDecoderFalseFragment),
-            ("testJSONDecoderTrueFragment", testJSONDecoderTrueFragment),
-            ("testJSONDecoderNullFragment", testJSONDecoderNullFragment),
-            ("testJSONNumberInArray", testJSONNumberInArray),
-            ("testJSONNumberInDict", testJSONNumberInDict),
-            ("testJSONNumberInArrayOfDicts", testJSONNumberInArrayOfDicts),
-            ("testJSONDecoderComplex1", testJSONDecoderComplex1)
-        ]
-    }
 
-    func testJSONDecoderStringFragment() {
+    func testJSONDecoderStringFragment() throws {
         let obj = JSONDecoder("\"string\"").jsonObject
         if case .JSONString(let string) = obj {
             XCTAssert(string == "string")
@@ -34,7 +20,7 @@ class DEjsonTests: XCTestCase {
         }
     }
 
-    func testJSONDecoderNumberFragment() {
+    func testJSONDecoderNumberFragment() throws {
         let obj = JSONDecoder("1.567").jsonObject
         if case .JSONNumber(let number) = obj {
             XCTAssert(number == 1.567)
@@ -43,7 +29,7 @@ class DEjsonTests: XCTestCase {
         }
     }
 
-    func testJSONDecoderFalseFragment() {
+    func testJSONDecoderFalseFragment() throws {
         let obj = JSONDecoder("false").jsonObject
         if case .JSONBoolean(let bool) = obj {
             XCTAssert(bool == false)
@@ -52,7 +38,7 @@ class DEjsonTests: XCTestCase {
         }
     }
 
-    func testJSONDecoderTrueFragment() {
+    func testJSONDecoderTrueFragment() throws {
         let obj = JSONDecoder("true").jsonObject
         if case .JSONBoolean(let bool) = obj {
             XCTAssert(bool == true)
@@ -61,7 +47,7 @@ class DEjsonTests: XCTestCase {
         }
     }
 
-    func testJSONDecoderNullFragment() {
+    func testJSONDecoderNullFragment() throws {
         let obj = JSONDecoder("null").jsonObject
         if case .JSONNull = obj {
         } else {
@@ -69,7 +55,7 @@ class DEjsonTests: XCTestCase {
         }
     }
 
-    func testJSONNumberInArray() {
+    func testJSONNumberInArray() throws {
         let obj = JSONDecoder("[123, 234]").jsonObject
         if case .JSONArray(let array) = obj {
             XCTAssert(array.count == 2)
@@ -88,7 +74,7 @@ class DEjsonTests: XCTestCase {
         }
     }
 
-    func testJSONNumberInDict() {
+    func testJSONNumberInDict() throws {
         let obj = JSONDecoder("{\"first\":123, \"second\":234}").jsonObject
         if case .JSONDictionary(let dict) = obj {
             XCTAssert(dict.count == 2)
@@ -107,7 +93,7 @@ class DEjsonTests: XCTestCase {
         }
     }
 
-    func testJSONNumberInArrayOfDicts() {
+    func testJSONNumberInArrayOfDicts() throws {
         let obj = JSONDecoder("[{\"first\":123,\"second\":234},{\"first\":123,\"second\":234}]").jsonObject
         if case .JSONArray(let array) = obj {
             XCTAssert(array.count == 2)
@@ -133,7 +119,7 @@ class DEjsonTests: XCTestCase {
         }
     }
 
-    func testJSONDecoderComplex1() {
+    func testJSONDecoderComplex1() throws {
         let obj = JSONDecoder("[{\"t\":\"1\",\"v\":\"1\",\"b\":false},{\"t\":\"2\",\"v\":\"1\",\"b\":false},{\"t\":\"3\",\"v\":\"1\",\"b\":false}]").jsonObject
         if case .JSONArray(let array) = obj {
             XCTAssert(array.count == 3)
@@ -157,3 +143,21 @@ class DEjsonTests: XCTestCase {
         }
     }
 }
+
+#if os(Linux)
+extension DEjsonTests {
+    static var allTests : [(String, DEjsonTests -> () throws -> Void)] {
+        return [
+            ("testJSONDecoderStringFragment", testJSONDecoderStringFragment),
+            ("testJSONDecoderNumberFragment", testJSONDecoderNumberFragment),
+            ("testJSONDecoderFalseFragment", testJSONDecoderFalseFragment),
+            ("testJSONDecoderTrueFragment", testJSONDecoderTrueFragment),
+            ("testJSONDecoderNullFragment", testJSONDecoderNullFragment),
+            ("testJSONNumberInArray", testJSONNumberInArray),
+            ("testJSONNumberInDict", testJSONNumberInDict),
+            ("testJSONNumberInArrayOfDicts", testJSONNumberInArrayOfDicts),
+            ("testJSONDecoderComplex1", testJSONDecoderComplex1)
+        ]
+    }
+}
+#endif

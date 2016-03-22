@@ -1,0 +1,36 @@
+(package
+  :name "DEjson"
+  
+  :tasks {
+    :default {
+      :tool "atllbuild"
+      :sources ["DEjson/**.swift"]
+      :name "DEjson"
+      :output-type "static-library"
+      :publish-product true
+      :compile-options ["-enable-testing"]
+    }
+
+    :check {
+      :tool "nop"
+      :dependencies ["run-tests"]
+    }
+
+    :build-tests {
+      :tool "atllbuild"
+      :sources ["DEjsonTests/**.swift"]
+      :output-type "executable"
+      :name "tests"
+      :dependencies ["default"]
+      :xctestify true
+      :xctest-strict true
+      :link-with ["DEjson.a"]
+    }
+
+    :run-tests {
+      :tool "xctestrun"
+      :test-executable ".atllbuild/products/tests"
+      :dependencies ["build-tests"]
+    }
+  }
+)

@@ -10,7 +10,7 @@
 // BSD license (see LICENSE.txt for full license text)
 
 #if os(Linux)
-    import UnchainedGlibc
+    import Glibc
 #else
     import Darwin
 #endif
@@ -28,8 +28,8 @@ func * (left: String, right: Int) -> String {
     return result
 }
 
-func -(left: String.Index, right: Int) -> String.Index {
-	return left.advancedBy(-right)
+func -(lhs: String.Index, rhs: Int) -> String.Index {
+	return lhs.advanced(by:-rhs)
 }
 
 // TODO: Add tests for JSONEncoder
@@ -69,11 +69,11 @@ public class JSONEncoder {
             return nil
         case .JSONArray(let arr):
             result = prettyPrint ? "[\n" : "["
-            for (index, item) in arr.enumerate() {
+            for (index, item) in arr.enumerated() {
                 if let string = decodeObject(item, prettyPrint: prettyPrint, indent: indent + 4) {
                     if index > 0 {
                         if prettyPrint && result[result.endIndex - 1] == "\n" {
-                            result.removeAtIndex(result.endIndex - 1)
+                            result.remove(at: result.endIndex - 1)
                         }
                         result += prettyPrint ? ",\n" : ","
                     }
@@ -92,7 +92,7 @@ public class JSONEncoder {
                 if let string = decodeObject(value, prettyPrint: prettyPrint, indent: indent + 4) {
                     if !first {
                         if prettyPrint && result[result.endIndex - 1] == "\n" {
-                            result.removeAtIndex(result.endIndex - 1)
+                            result.remove(at: result.endIndex - 1)
                         }
                         result += prettyPrint ? ",\n" : ","
                     } else {
@@ -113,9 +113,9 @@ public class JSONEncoder {
     
     func encodeString(string: String) -> String {
         var result:String = ""
-        var generator = string.unicodeScalars.generate()
+        var iterator = string.unicodeScalars.makeIterator()
 
-        while let c = generator.next() {
+        while let c = iterator.next() {
             switch c.value {
             case 8: // b -> backspace
                 result.append(UnicodeScalar(92))
@@ -149,8 +149,8 @@ public class JSONEncoder {
                     // This is so convoluted because of Swift compiler bug on iOS 8.4 (works simpler on 9.0+)
                     var highString = self.makeHexString(high)
                     var lowString = self.makeHexString(low)
-                    var lowGen = lowString.unicodeScalars.generate()
-                    var highGen = highString.unicodeScalars.generate()
+                    var lowGen = lowString.unicodeScalars.makeIterator()
+                    var highGen = highString.unicodeScalars.makeIterator()
                     result.append(highGen.next()!)
                     result.append(highGen.next()!)
                     result.append(lowGen.next()!)

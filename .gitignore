@@ -1,3 +1,6 @@
 xcuserdata
 .build
 Packages/
+.atllbuild/
+DEjson.sublime-workspace
+bin/

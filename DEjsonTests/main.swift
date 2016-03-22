@@ -9,4 +9,4 @@
 import XCTest
 
 print("Starting tests...")
-XCTMain([DEjsonTests()])
+XCTMain([testCase(DEjsonTests.allTests)])

@@ -20,7 +20,7 @@ public enum JSONObject {
     case JSONNull
     case JSONInvalid
     
-    public enum Error: ErrorType {
+    public enum Error: ErrorProtocol {
         case NotConvertible
     }
 
@@ -34,7 +34,7 @@ public enum JSONObject {
         }
     }
 
-    public init<T: UnsignedIntegerType>(_ number: T) {
+    public init<T: UnsignedInteger>(_ number: T) {
         switch number {
         case is UInt:
             self = .JSONNumber(Double(number as! UInt))
@@ -51,7 +51,7 @@ public enum JSONObject {
         }
     }
 
-    public init<T: SignedIntegerType>(_ number: T) {
+    public init<T: SignedInteger>(_ number: T) {
         switch number {
         case is Int:
             self = .JSONNumber(Double(number as! Int))
@@ -68,7 +68,7 @@ public enum JSONObject {
         }
     }
 
-    public init<T: FloatingPointType>(_ number: T) {
+    public init<T: FloatingPoint>(_ number: T) {
         switch number {
         case is Float:
             self = .JSONNumber(Double(number as! Float))
@@ -120,7 +120,7 @@ public enum JSONObject {
         }
     }
 
-    public func map<T: FloatingPointType>() throws -> T {
+    public func map<T: FloatingPoint>() throws -> T {
         switch self {
         case .JSONString(let string):
             if let n:T = self.StringToFloat(string) {
@@ -144,7 +144,7 @@ public enum JSONObject {
         }
     }
 
-    public func map<T: UnsignedIntegerType>() throws -> T {
+    public func map<T: UnsignedInteger>() throws -> T {
         switch self {
         case .JSONString(let string):
             if let n:T = self.StringToUInt(string) {
@@ -165,7 +165,7 @@ public enum JSONObject {
         }
     }
 
-    public func map<T: SignedIntegerType>() throws -> T {
+    public func map<T: SignedInteger>() throws -> T {
         switch self {
         case .JSONString(let string):
             if let n:T = self.StringToInt(string) {
@@ -189,7 +189,7 @@ public enum JSONObject {
     public func map() throws -> Bool {
         switch self {
         case .JSONString(let string):
-            let lc = string.lowercaseString
+            let lc = string.lowercased()
             if lc == "true" || lc == "yes" || lc == "1" || lc == "on" {
                 return true
             }
@@ -215,7 +215,7 @@ public enum JSONObject {
     
     // MARK: - Workarounds for Swift 2.0 not naming protocols correctly
     
-    private func DoubleToUInt<T: UnsignedIntegerType>(number: Double) -> T? {
+    private func DoubleToUInt<T: UnsignedInteger>(number: Double) -> T? {
         switch T(0) {
         case is UInt:
             return UInt(number) as? T
@@ -232,7 +232,7 @@ public enum JSONObject {
         }
     }
     
-    private func StringToUInt<T: UnsignedIntegerType>(string: String) -> T? {
+    private func StringToUInt<T: UnsignedInteger>(string: String) -> T? {
         switch T(0) {
         case is UInt:
             return UInt(string) as? T
@@ -249,7 +249,7 @@ public enum JSONObject {
         }
     }
 
-    private func DoubleToInt<T: SignedIntegerType>(number: Double) -> T? {
+    private func DoubleToInt<T: SignedInteger>(number: Double) -> T? {
         switch T(0) {
         case is Int:
             return Int(number) as? T
@@ -266,7 +266,7 @@ public enum JSONObject {
         }
     }
 
-    private func StringToInt<T: SignedIntegerType>(string: String) -> T? {
+    private func StringToInt<T: SignedInteger>(string: String) -> T? {
         switch T(0) {
         case is Int:
             return Int(string) as? T
@@ -283,7 +283,7 @@ public enum JSONObject {
         }
     }
 
-    private func StringToFloat<T: FloatingPointType>(string: String) -> T? {
+    private func StringToFloat<T: FloatingPoint>(string: String) -> T? {
         switch T(0) {
         case is Double:
             return Double(string) as? T
